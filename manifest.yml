@@ -1,0 +1,8 @@
+---
+applications:
+  - name: cf-test-app
+    memory: 128M
+    instances: 1
+    random-route: true
+    buildpacks:
+      - python_buildpack

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CF Test App</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>CF Test App</h1>
+      <p class="subtitle">Cloud Foundry sample application</p>
+    </header>
+
+    <section class="grid">
+      <div class="card"><div class="k">CF API</div><div class="v">{{ meta.cf_api }}</div></div>
+      <div class="card"><div class="k">App name</div><div class="v">{{ meta.app_name }}</div></div>
+      <div class="card wide"><div class="k">App URIs</div><div class="v">{{ meta.app_uris|join(', ') if meta.app_uris else '—' }}</div></div>
+      <div class="card"><div class="k">Instance index</div><div class="v">{{ meta.instance_index }}</div></div>
+      <div class="card"><div class="k">Memory limit</div><div class="v">{{ meta.memory_limit }}</div></div>
+      <div class="card"><div class="k">Disk limit</div><div class="v">{{ meta.disk_limit }}</div></div>
+      <div class="card"><div class="k">Space name</div><div class="v">{{ meta.space_name }}</div></div>
+      <div class="card"><div class="k">Org name</div><div class="v">{{ meta.org_name }}</div></div>
+    </section>
+
+    <h2>Service Bindings (VCAP_SERVICES – env)</h2>
+    {% if vcap_env_error %}<p class="warn">{{ vcap_env_error }}</p>{% endif %}
+    {% if vcap_env %}
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Service</th><th>Plan</th><th>Instance name</th><th>Instance GUID</th><th>Binding GUID</th><th>Binding name</th><th>Credentials (keys)</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for b in vcap_env %}
+          <tr>
+            <td>{{ b.service_label }}</td>
+            <td>{{ b.plan }}</td>
+            <td>{{ b.instance_name }}</td>
+            <td>{{ b.instance_guid }}</td>
+            <td>{{ b.binding_guid }}</td>
+            <td>{{ b.binding_name }}</td>
+            <td>{{ b.credentials.keys()|list|join(', ') }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No services bound via VCAP_SERVICES.</p>
+    {% endif %}
+
+    <h2>Service Bindings (File‑based VCAP)</h2>
+    {% if vcap_file_error %}<p class="warn">{{ vcap_file_error }}</p>{% endif %}
+    {% if vcap_file %}
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Service</th><th>Plan</th><th>Instance name</th><th>Instance GUID</th><th>Binding GUID</th><th>Binding name</th><th>Credentials (keys)</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for b in vcap_file %}
+          <tr>
+            <td>{{ b.service_label }}</td>
+            <td>{{ b.plan }}</td>
+            <td>{{ b.instance_name }}</td>
+            <td>{{ b.instance_guid }}</td>
+            <td>{{ b.binding_guid }}</td>
+            <td>{{ b.binding_name }}</td>
+            <td>{{ b.credentials.keys()|list|join(', ') }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No services bound via file‑based VCAP.</p>
+    {% endif %}
+
+    <h2>Kubernetes Service Bindings</h2>
+    {% if k8s %}
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Binding name</th><th>Binding GUID</th><th>Data (keys)</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for b in k8s %}
+          <tr>
+            <td>{{ b.binding_name }}</td>
+            <td>{{ b.binding_guid }}</td>
+            <td>{{ b.data.keys()|list|join(', ') }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No Kubernetes service bindings found.</p>
+    {% endif %}
+
+    <footer>
+      <p>Health: <code><a href="/health">/health</a></code> · JSON: <code><a href="/bindings.json">/bindings.json</a></code></p>
+    </footer>
+  </main>
+</body>
+</html>
